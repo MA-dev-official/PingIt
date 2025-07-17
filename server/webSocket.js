@@ -1,69 +1,83 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import dotenv from "dotenv";
 
-dotenv.config({
-  path: "./.env",
-});
+ 
 
 const port = process.env.PORT || 5000;
 
+
 const app = express();
 const server = createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URI || "*", // Frontend ka URL lagana ho to yahan dal sakte ho
+    origin: "*",
+    methods: ["GET", "POST"],
   },
 });
 
+// Waiting list for matchmaking
 const waitingUsers = [];
 
 io.on("connection", (socket) => {
   console.log("✅ User connected:", socket.id);
 
+  // User sets username
   socket.on("setUsername", (username) => {
-    console.log("Username set:", username);
     socket.username = username || "Guest";
+    console.log("Username set:", socket.username);
 
+    // Add to waiting list
     waitingUsers.push(socket);
     console.log(`User ${socket.username} added to waiting list`);
 
     tryMatch();
   });
 
+  // Send a message
   socket.on("send_message", ({ roomId, message }) => {
     console.log(`${socket.username}: ${message} in room: ${roomId}`);
+
     io.to(roomId).emit("receive_message", {
       senderUsername: socket.username,
       message,
     });
   });
 
+  // User requests new match
   socket.on("find_new_match", () => {
     if (socket.roomId) {
+      // Notify partner
+      socket.to(socket.roomId).emit("partner_disconnected");
+
+      // Leave room
       socket.leave(socket.roomId);
       socket.roomId = null;
     }
+
     waitingUsers.push(socket);
     console.log(`${socket.username} wants new match`);
     tryMatch();
   });
 
+  // User disconnects
   socket.on("disconnect", () => {
     console.log("❌ User disconnected:", socket.id);
 
-    // Waiting list se remove
+    // Remove from waiting list
     const index = waitingUsers.indexOf(socket);
     if (index !== -1) {
       waitingUsers.splice(index, 1);
     }
 
+    // Notify partner if matched
     if (socket.roomId) {
-      io.to(socket.roomId).emit("partner_disconnected");
+      socket.to(socket.roomId).emit("partner_disconnected");
     }
   });
 
+  // Try to match two users
   function tryMatch() {
     if (waitingUsers.length >= 2) {
       const user1 = waitingUsers.shift();
@@ -76,8 +90,15 @@ io.on("connection", (socket) => {
       user1.join(roomId);
       user2.join(roomId);
 
-      user1.emit("matched", { roomId, partnerUsername: user2.username });
-      user2.emit("matched", { roomId, partnerUsername: user1.username });
+      user1.emit("matched", {
+        roomId,
+        partnerUsername: user2.username,
+      });
+
+      user2.emit("matched", {
+        roomId,
+        partnerUsername: user1.username,
+      });
 
       console.log(`✅ Matched: ${user1.username} & ${user2.username} in ${roomId}`);
     }

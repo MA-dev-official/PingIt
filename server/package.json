@@ -4,7 +4,7 @@
   "main": "webSocket.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon -r dotenv/config --experimental-json-modules webSocket.js",
+    "dev": "nodemon  webSocket.js",
     "start": "node webSocket.js"
   },
   "keywords": [],
@@ -12,8 +12,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "nodemon": "^3.1.10",
     "socket.io": "^4.8.1"
