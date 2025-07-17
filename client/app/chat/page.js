@@ -20,7 +20,10 @@ export default function Chat() {
   const { register, handleSubmit, reset } = useForm();
 
   useEffect(() => {
-    socketRef.current = io(process.env.NEXT_PUBLIC_SERVER_URI);
+    socketRef.current = io("https://precious-rejoicing.up.railway.app/",{
+      transports: ["websocket"],
+      secure: true
+    });
 
     socketRef.current.on("connect", () => {
       const username = searchParams.get("username");
