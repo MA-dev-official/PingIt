@@ -20,7 +20,9 @@ const io = new Server(server, {
 
 // Waiting list for matchmaking
 const waitingUsers = [];
-
+app.get("/", (req, res) => {
+  res.send("bro back-end chal raha h");
+})
 io.on("connection", (socket) => {
   console.log("✅ User connected:", socket.id);
 
