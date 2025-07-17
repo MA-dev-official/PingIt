@@ -82,7 +82,10 @@ io.on("connection", (socket) => {
     if (waitingUsers.length >= 2) {
       const user1 = waitingUsers.shift();
       const user2 = waitingUsers.shift();
-
+      if(user1.id === user2.id){
+        waitingUsers.push(user1);
+          return tryMatch();
+        };
       const roomId = `room-${user1.id}-${user2.id}`;
       user1.roomId = roomId;
       user2.roomId = roomId;
