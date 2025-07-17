@@ -20,7 +20,7 @@ export default function Chat() {
   const { register, handleSubmit, reset } = useForm();
 
   useEffect(() => {
-    socketRef.current = io("https://precious-rejoicing.up.railway.app/",{
+    socketRef.current = io(process.env.NEXT_PUBLIC_SERVER_URI,{
       transports: ["websocket"],
       secure: true
     });
