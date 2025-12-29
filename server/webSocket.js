@@ -8,7 +8,7 @@ const port = process.env.PORT || 8080;
 
 
 const app = express();
-app.use(cors({origin:"*"}));
+app.use(cors({origin:process.env.FRONTEND_URL}));
 const server = createServer(app);
 
 const io = new Server(server, {
