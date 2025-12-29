@@ -9,7 +9,7 @@ const port = process.env.PORT || 8080;
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const app = express();
-app.use(cors({origin: frontendUrl }));
+app.use(cors({origin:frontendUrl }));
 const server = createServer(app);
 
 const io = new Server(server, {
