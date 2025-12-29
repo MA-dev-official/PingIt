@@ -33,3 +33,7 @@ This app is **completely DB-less** and uses **temporary usernames only**, which 
 ```bash
 git clone https://github.com/MA-dev-official/PingIt.git
 cd PingIt
+cd client 
+npm run dev
+cd server
+npm run dev
